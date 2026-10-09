@@ -19,6 +19,9 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
+# Хранилище истории диалогов (user_id: список сообщений)
+user_histories = {}
+
 # ============ GIGACHAT ============
 def get_gigachat_token():
     url = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
@@ -310,6 +313,10 @@ async def cmd_start(message: Message):
 @dp.message(Command("menu"))
 async def cmd_menu(message: Message):
     await message.answer("Выбери раздел:", reply_markup=main_menu())
+@dp.message(Command("reset"))
+async def cmd_reset(message: Message):
+    user_histories.pop(message.from_user.id, None)
+    await message.answer("🧹 История диалога очищена! Начинаем с чистого листа.")
 
 # ============ КНОПКИ ============
 @dp.callback_query(F.data == "back_main")
@@ -477,17 +484,36 @@ async def handle_text(message: Message):
         )
         return
 
-    # 7. FALLBACK → GigaChat
+        # 7. FALLBACK → GigaChat (С ИСТОРИЕЙ)
     await message.answer("🤔 думаю-думаю...")
 
+    user_id = message.from_user.id
+    
+    # Получаем историю или создаем новую
+    if user_id not in user_histories:
+        user_histories[user_id] = []
+    
+    history = user_histories[user_id]
+    
+    # Добавляем текущий вопрос
+    history.append({"role": "user", "content": message.text})
+    
+    # Оставляем только последние 10 сообщений (5 пар вопрос-ответ), чтобы не тратить лимиты GigaChat
+    if len(history) > 10:
+        history = history[-10:]
+    
+    # Формируем запрос с историей
     messages_for_api = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": message.text}
-    ]
-
+        {"role": "system", "content": SYSTEM_PROMPT}
+    ] + history
+    
     response = ask_gigachat(messages_for_api)
 
     if response:
+        # Добавляем ответ бота в историю
+        history.append({"role": "assistant", "content": response})
+        user_histories[user_id] = history
+        
         await message.answer(f"{response}\n\n🔙 В меню: /menu")
     else:
         await message.answer(
@@ -519,4 +545,3 @@ async def main():
 if __name__ == "__main__":
     import asyncio
     asyncio.run(main())
-    
