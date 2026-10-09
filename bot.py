@@ -2,6 +2,7 @@ import os
 import logging
 import uuid
 import httpx
+from aiohttp import web
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
@@ -495,11 +496,27 @@ async def handle_text(message: Message):
             "🔙 В меню: /menu"
         )
 
+# ============ HEALTH ENDPOINT ДЛЯ RENDER ============
+async def health(request):
+    return web.Response(text="OK")
+
+async def start_web_server():
+    app = web.Application()
+    app.router.add_get("/", health)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    port = int(os.getenv("PORT", 8080))
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    print(f"✅ Health server started on port {port}")
+
 # ============ ЗАПУСК ============
 async def main():
-    print("Бот запущен...")
+    print("🤖 Бот запущен...")
+    await start_web_server()
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
     import asyncio
     asyncio.run(main())
+    
