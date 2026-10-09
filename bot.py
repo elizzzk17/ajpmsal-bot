@@ -488,8 +488,8 @@ async def handle_text(message: Message):
             "Я рядом. 🌱\n\n🔙 В меню: /menu"
         )
         return
-
-            # 7. FALLBACK → GigaChat (С ИСТОРИЕЙ И ЛИМИТОМ)
+    
+        # 7. FALLBACK → GigaChat (С ИСТОРИЕЙ И ЛИМИТОМ)
     user_id = message.from_user.id
     today = datetime.now().strftime("%Y-%m-%d")
 
