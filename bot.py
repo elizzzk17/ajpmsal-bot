@@ -557,7 +557,7 @@ async def start_web_server():
     app.router.add_get("/", health)
     runner = web.AppRunner(app)
     await runner.setup()
-    port = int(os.getenv("PORT", 8080))
+    port = int(os.getenv("PORT", 7860))
     site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
     print(f"✅ Health server started on port {port}")
