@@ -2,6 +2,7 @@ import os
 import logging
 import uuid
 import httpx
+from datetime import datetime
 from aiohttp import web
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, F
@@ -21,6 +22,10 @@ dp = Dispatcher()
 
 # Хранилище истории диалогов (user_id: список сообщений)
 user_histories = {}
+
+# Хранилище дневных лимитов (user_id: {"count": N, "date": "YYYY-MM-DD"})
+user_limits = {}
+DAILY_LIMIT = 10
 
 # ============ GIGACHAT ============
 def get_gigachat_token():
@@ -484,10 +489,31 @@ async def handle_text(message: Message):
         )
         return
 
-        # 7. FALLBACK → GigaChat (С ИСТОРИЕЙ)
-    await message.answer("🤔 думаю-думаю...")
-
+            # 7. FALLBACK → GigaChat (С ИСТОРИЕЙ И ЛИМИТОМ)
     user_id = message.from_user.id
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    # Проверка дневного лимита
+    user_data = user_limits.get(user_id, {"count": 0, "date": today})
+
+    # Если наступил новый день — сбрасываем счётчик
+    if user_data["date"] != today:
+        user_data = {"count": 0, "date": today}
+
+    if user_data["count"] >= DAILY_LIMIT:
+        await message.answer(
+            "Ой, ты сегодня уже задал(а) 15 вопросов — это мой дневной максимум 🙈\n\n"
+            "Давай сделаем паузу: у меня тоже есть право на отдых. 😴\n"
+            "Возвращайся завтра, я с радостью помогу! 🌙\n\n"
+            "А пока можешь посмотреть разделы в меню — там много полезного: /menu"
+        )
+        return
+
+    # Увеличиваем счётчик и сохраняем
+    user_data["count"] += 1
+    user_limits[user_id] = user_data
+
+    await message.answer("🤔 думаю-думаю...")
     
     # Получаем историю или создаем новую
     if user_id not in user_histories:
