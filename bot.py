@@ -18,7 +18,7 @@ GIGACHAT_AUTH = os.getenv("GIGACHAT_KEY")
 os.environ["SSL_CERT_FILE"] = os.path.expanduser("~/Documents/legaltech/russian_ca.crt")
 
 logging.basicConfig(level=logging.INFO)
-session = AiohttpSession(timeout=120)
+session = AiohttpSession(timeout=30)
 bot = Bot(token=TOKEN, session=session)
 dp = Dispatcher()
 
