@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
+from aiogram.client.session.aiohttp import AiohttpSession
 
 # ============ ЗАГРУЗКА ТОКЕНОВ ============
 load_dotenv()
@@ -17,7 +18,8 @@ GIGACHAT_AUTH = os.getenv("GIGACHAT_KEY")
 os.environ["SSL_CERT_FILE"] = os.path.expanduser("~/Documents/legaltech/russian_ca.crt")
 
 logging.basicConfig(level=logging.INFO)
-bot = Bot(token=TOKEN)
+session = AiohttpSession(timeout=120)
+bot = Bot(token=TOKEN, session=session)
 dp = Dispatcher()
 
 # Хранилище истории диалогов (user_id: список сообщений)
