@@ -54,7 +54,7 @@ def ask_gigachat(messages):
             "Authorization": f"Bearer {token}"
         }
         payload = {
-            "model": "GigaChat-Lite",
+            "model": "GigaChat",
             "messages": messages,
             "temperature": 0.7
         }
