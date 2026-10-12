@@ -39,7 +39,7 @@ def get_gigachat_token():
         "Authorization": f"Basic {GIGACHAT_AUTH}"
     }
     data = {"scope": "GIGACHAT_API_PERS"}
-    r = httpx.post(url, headers=headers, data=data, verify=False, timeout=15)
+    r = httpx.post(url, headers=headers, data=data, verify=False, timeout=10)
     return r.json().get("access_token")
 
 def ask_gigachat(messages):
@@ -54,7 +54,7 @@ def ask_gigachat(messages):
             "Authorization": f"Bearer {token}"
         }
         payload = {
-            "model": "GigaChat",
+            "model": "GigaChat-Lite",
             "messages": messages,
             "temperature": 0.7
         }
