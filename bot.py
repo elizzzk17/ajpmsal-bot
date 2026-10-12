@@ -298,7 +298,7 @@ def templates_menu():
 def links_menu():
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="📢 Telegram-канал", url="https://t.me/ajpmsal")],
-        [InlineKeyboardButton(text="🎥 Записи лекций", url="https://disk.360.yandex.ru/i/WQoyXs_CfuJ8Xw")],
+        [InlineKeyboardButton(text="🎥 Записи лекций", url="https://docs.google.com/spreadsheets/d/18WiIabm9JN5eBYlM2zYLyylP_HxXbIJRFANbB0vEy2Q/edit?usp=sharing")],
         [InlineKeyboardButton(text="⬅️ Назад", callback_data="back_main")],
     ])
 
