@@ -39,7 +39,7 @@ def get_gigachat_token():
         "Authorization": f"Basic {GIGACHAT_AUTH}"
     }
     data = {"scope": "GIGACHAT_API_PERS"}
-    r = httpx.post(url, headers=headers, data=data, verify=False, timeout=30)
+    r = httpx.post(url, headers=headers, data=data, verify=False, timeout=15)
     return r.json().get("access_token")
 
 def ask_gigachat(messages):
